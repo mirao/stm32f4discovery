@@ -1,0 +1,1 @@
+### Playing with MCU [STM32F407G-DISC1](https://www.st.com/en/evaluation-tools/stm32f4discovery.html) in [Visual Studio Code](https://code.visualstudio.com/) using [PlatformIO IDE](https://platformio.org/)

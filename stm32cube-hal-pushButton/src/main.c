@@ -4,15 +4,20 @@
 
 #include "stm32f4xx_hal.h"
 
-/** Whether push button turns LED on or only toggles LED's state */
-#define TURN_LED_ON_WHEN_PUSHING_BUTTON 1
+/**
+ * How push button affects LED(s)
+ * 0 - Push button toggles blue LED state
+ * 1 - Push button turns blue LED on
+ * 2 - Push button turns next LED (starting blue one)
+ */
+#define PUSH_LED_MODE 2
 
 #define PUSH_BUTTON_GPIO_PORT GPIOA
 #define PUSH_BUTTON_PIN GPIO_PIN_0
 #define PUSH_GPIO_PORT_CLOCK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 
 #define LED_GPIO_PORT GPIOD
-#define LED_PIN GPIO_PIN_15  // Blue LED LD6. Follow user manual for info about other LED pins
+#define LED_PIN GPIO_PIN_15  // Blue LED LD6 for modes 0/1 (see above). Follow user manual for info about other LED pins
 #define LED_GPIO_PORT_CLOCK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE()
 
 void Push_Button_Init();
@@ -28,22 +33,45 @@ int main(void) {
     LED_Init();
     Push_Button_Init();
 
-    while (1) {
-#if TURN_LED_ON_WHEN_PUSHING_BUTTON
-        uint8_t state;
+#if PUSH_LED_MODE == 1
+    uint8_t pinState;
+#else
+    uint16_t currentLed;
+    uint16_t nextLed;
+#if PUSH_LED_MODE == 2
+    uint16_t leds[] = {GPIO_PIN_12, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15};
+    uint8_t ledId = 3;  // ID of blue LED
+    nextLed = leds[ledId];
+    uint8_t isLEDFirst = 1;
+#else
+    nextLed = LED_PIN;  // Only one LED is turned on/off
 #endif
+#endif
+
+    while (1) {
         // Is button pressed?
         if (GPIO_PIN_SET == HAL_GPIO_ReadPin(PUSH_BUTTON_GPIO_PORT, PUSH_BUTTON_PIN)) {
-#if TURN_LED_ON_WHEN_PUSHING_BUTTON
-            state = GPIO_PIN_SET;
+#if PUSH_LED_MODE == 1
+            pinState = GPIO_PIN_SET;
         } else {
-            state = GPIO_PIN_RESET;
+            pinState = GPIO_PIN_RESET;
         }
-            // Turn LED on or off
-            HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, state);
+        // Turn LED on or off
+        HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, pinState);
 #else
+            currentLed = nextLed;
             // Toggle LED state
-            HAL_GPIO_TogglePin(LED_GPIO_PORT, LED_PIN);
+            HAL_GPIO_TogglePin(LED_GPIO_PORT, currentLed);
+#if PUSH_LED_MODE == 2
+            if (isLEDFirst) {
+                isLEDFirst = 0;
+            } else {
+                ledId = (ledId + 1) % 4;
+                nextLed = leds[ledId];
+                // Toggle LED state
+                HAL_GPIO_TogglePin(LED_GPIO_PORT, nextLed);
+            }
+#endif
             // Wait a moment to give user chance to release button
             HAL_Delay(100);
         }

@@ -4,6 +4,9 @@
 
 #include "stm32f4xx_hal.h"
 
+/** Whether push button turns LED on or only toggles LED's state */
+#define TURN_LED_ON_WHEN_PUSHING_BUTTON 1
+
 #define PUSH_BUTTON_GPIO_PORT GPIOA
 #define PUSH_BUTTON_PIN GPIO_PIN_0
 #define PUSH_GPIO_PORT_CLOCK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
@@ -26,13 +29,25 @@ int main(void) {
     Push_Button_Init();
 
     while (1) {
+#if TURN_LED_ON_WHEN_PUSHING_BUTTON
+        uint8_t state;
+#endif
         // Is button pressed?
         if (GPIO_PIN_SET == HAL_GPIO_ReadPin(PUSH_BUTTON_GPIO_PORT, PUSH_BUTTON_PIN)) {
+#if TURN_LED_ON_WHEN_PUSHING_BUTTON
+            state = GPIO_PIN_SET;
+        } else {
+            state = GPIO_PIN_RESET;
+        }
+            // Turn LED on or off
+            HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, state);
+#else
             // Toggle LED state
             HAL_GPIO_TogglePin(LED_GPIO_PORT, LED_PIN);
             // Wait a moment to give user chance to release button
-            HAL_Delay(100);                             
+            HAL_Delay(100);
         }
+#endif
     }
 }
 

@@ -8,7 +8,7 @@
  * How push button affects LED(s)
  * 0 - Push button toggles blue LED state
  * 1 - Push button turns blue LED on
- * 2 - Push button turns next LED (starting blue one)
+ * 2 - Push button turns current LED off and next LED on (starting blue one)
  */
 #define PUSH_LED_MODE 2
 

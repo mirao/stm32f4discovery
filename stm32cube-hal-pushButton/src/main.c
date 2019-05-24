@@ -83,7 +83,7 @@ int main(void) {
     }
 
 #elif PUSH_LED_MODE == 3
-    uint16_t buttonPressed = 0;
+    uint8_t buttonPressed = 0;
     uint16_t buttonPressedConfidenceLevel = 0;
     uint16_t buttonRelesedConfidenceLevel = 0;
     uint16_t confidenceThreshold = 1000;  // Lower means higher probability of bounces

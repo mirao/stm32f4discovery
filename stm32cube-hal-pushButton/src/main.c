@@ -6,18 +6,19 @@
 
 /**
  * How push button affects LED(s)
- * 0 - Push button toggles blue LED state
- * 1 - Push button turns blue LED on
- * 2 - Push button turns current LED off and next LED on (starting blue one)
+ * 0 - Push button toggles blue LED using delay. If pressed for long time, LED state is changing.
+ * 1 - Push button turns blue LED till it's pressed
+ * 2 - Push button toggles LEDs one by one in circle, starting blue one
+ * 3 - Push button toggles blue LED using confidence level counter. If pressed for long time, LED state doesn't change.
  */
-#define PUSH_LED_MODE 2
+#define PUSH_LED_MODE 3
 
 #define PUSH_BUTTON_GPIO_PORT GPIOA
 #define PUSH_BUTTON_PIN GPIO_PIN_0
 #define PUSH_GPIO_PORT_CLOCK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 
 #define LED_GPIO_PORT GPIOD
-#define LED_PIN GPIO_PIN_15  // Blue LED LD6 for modes 0/1 (see above). Follow user manual for info about other LED pins
+#define LED_PIN GPIO_PIN_15  // Blue LED LD6 for modes 0/1/3 (see above). Follow user manual for info about other LED pins
 #define LED_GPIO_PORT_CLOCK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE()
 
 void Push_Button_Init();
@@ -33,36 +34,41 @@ int main(void) {
     LED_Init();
     Push_Button_Init();
 
-#if PUSH_LED_MODE == 1
-    uint8_t pinState;
-#else
-    uint16_t currentLed;
-    uint16_t nextLed;
-#if PUSH_LED_MODE == 2
-    uint16_t leds[] = {GPIO_PIN_12, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15};
-    uint8_t ledId = 3;  // ID of blue LED
-    nextLed = leds[ledId];
-    uint8_t isLEDFirst = 1;
-#else
-    nextLed = LED_PIN;  // Only one LED is turned on/off
-#endif
-#endif
-
+#if PUSH_LED_MODE == 0
     while (1) {
         // Is button pressed?
         if (GPIO_PIN_SET == HAL_GPIO_ReadPin(PUSH_BUTTON_GPIO_PORT, PUSH_BUTTON_PIN)) {
-#if PUSH_LED_MODE == 1
+            // Toggle LED state
+            HAL_GPIO_TogglePin(LED_GPIO_PORT, LED_PIN);
+            // Wait a moment to give user chance to release button
+            HAL_Delay(100);
+        }
+    }
+#elif PUSH_LED_MODE == 1
+    uint8_t pinState;
+    while (1) {
+        // Is button pressed?
+        if (GPIO_PIN_SET == HAL_GPIO_ReadPin(PUSH_BUTTON_GPIO_PORT, PUSH_BUTTON_PIN)) {
             pinState = GPIO_PIN_SET;
         } else {
             pinState = GPIO_PIN_RESET;
         }
         // Turn LED on or off
         HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, pinState);
-#else
+    }
+#elif PUSH_LED_MODE == 2
+    uint16_t currentLed;
+    uint16_t nextLed;
+    uint16_t leds[] = {GPIO_PIN_12, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15};
+    uint8_t ledId = 3;  // at first the blue LED will be turned on
+    nextLed = leds[ledId];
+    uint8_t isLEDFirst = 1;
+    while (1) {
+        // Is button pressed?
+        if (GPIO_PIN_SET == HAL_GPIO_ReadPin(PUSH_BUTTON_GPIO_PORT, PUSH_BUTTON_PIN)) {
             currentLed = nextLed;
             // Toggle LED state
             HAL_GPIO_TogglePin(LED_GPIO_PORT, currentLed);
-#if PUSH_LED_MODE == 2
             if (isLEDFirst) {
                 isLEDFirst = 0;
             } else {
@@ -71,12 +77,44 @@ int main(void) {
                 // Toggle LED state
                 HAL_GPIO_TogglePin(LED_GPIO_PORT, nextLed);
             }
-#endif
             // Wait a moment to give user chance to release button
             HAL_Delay(100);
         }
-#endif
     }
+
+#elif PUSH_LED_MODE == 3
+    uint16_t buttonPressed = 0;
+    uint16_t buttonPressedConfidenceLevel = 0;
+    uint16_t buttonRelesedConfidenceLevel = 0;
+    uint16_t confidenceThreshold = 1000;  // Lower means higher probability of bounces
+
+    while (1) {
+        if (GPIO_PIN_SET == HAL_GPIO_ReadPin(PUSH_BUTTON_GPIO_PORT, PUSH_BUTTON_PIN)) {
+            if (buttonPressed == 0) {
+                buttonPressedConfidenceLevel++;
+                buttonRelesedConfidenceLevel = 0;
+                // Was button pressed on purpose or during release by bounce?
+                if (buttonPressedConfidenceLevel > confidenceThreshold) {
+                    // Toggle LED
+                    HAL_GPIO_TogglePin(LED_GPIO_PORT, LED_PIN);
+                    buttonPressed = 1;
+                }
+            }
+        } else {
+            if (buttonPressed == 1) {
+                buttonRelesedConfidenceLevel++;
+                buttonPressedConfidenceLevel = 0;
+                // Was button released on purpose or bounced only during pressing?
+                if (buttonRelesedConfidenceLevel > confidenceThreshold) {
+                    buttonPressed = 0;  // Button released
+                }
+            }
+        }
+    }
+
+#else
+#error Unknown push mode
+#endif
 }
 
 /**

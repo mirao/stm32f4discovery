@@ -28,17 +28,7 @@
 .type   main, %function
 
 main:
-    // Enable IO port D clock
-    LDR     r0, =RCC_AHB1ENR    
-    LDR     r1, [r0]            
-    ORR     r1, GPIODEN
-    STR     r1, [r0]
-
-    // Configure GPIOD pins 12-15 as outputs where LEDs are connected to
-    LDR     r0, =GPIOD_MODER 
-    LDR     r1, =(MODER15_OUT | MODER14_OUT | MODER13_OUT | MODER12_OUT)
-    STR     r1, [r0]            
-    
+    BL init
     // GPIOD output data register, storing bits to it turns LED on
     LDR     r2, =GPIOD_ODR
     MOV     r1, LED_GREEN // Initial LED
@@ -52,6 +42,19 @@ blink:
     MOV     r1, r3    // Go back to the 1st LED
     B       blink
 
+init:
+    // Enable IO port D clock
+    LDR     r0, =RCC_AHB1ENR    
+    LDR     r1, [r0]            
+    ORR     r1, GPIODEN
+    STR     r1, [r0]
+
+    // Configure GPIOD pins 12-15 as outputs where LEDs are connected to
+    LDR     r0, =GPIOD_MODER 
+    LDR     r1, =(MODER15_OUT | MODER14_OUT | MODER13_OUT | MODER12_OUT)
+    STR     r1, [r0]            
+    BX      lr
+    
 delay:
     MOVT    r0, DELAY // Set DELAY to high halfword to get DELAY*65536 iterations
 1:                              

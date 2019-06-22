@@ -5,13 +5,17 @@
 .syntax unified
 .cpu cortex-m4
 
+.EQU PERIPH_BITBAND_REGION_START, 0x40000000
+.EQU PERIPH_BITBAND_ALIAS_START, 0x42000000
+
 .EQU RCC_BASE,        0x40023800
 .EQU RCC_AHB1ENR,     RCC_BASE + 0x30 // Peripheral clock enable register
+.EQU GPIODEN_BIT,     3 // IO port D bit number for "clock enable"
+.EQU RCC_AHB1ENR_GPIODEN, PERIPH_BITBAND_ALIAS_START + (RCC_AHB1ENR - PERIPH_BITBAND_REGION_START) * 32 + GPIODEN_BIT * 4 // Bit-band alias to GPIODEN bit
 .EQU GPIOD_BASE,      0x40020C00
 .EQU GPIOD_MODER,     GPIOD_BASE + 0x00 // GPIO port mode register
 .EQU GPIOD_ODR,       GPIOD_BASE + 0x14 // GPIOD output data register
 
-.EQU GPIODEN,         1 << 3 // IO port D clock enable
 .EQU MODER15_OUT,     1 << 30 // For pin PD15 connected to LD6 Blue
 .EQU MODER14_OUT,     1 << 28 // For pin PD14 connected to LD5 Red
 .EQU MODER13_OUT,     1 << 26 // For pin PD13 connected to LD3 Orange
@@ -32,7 +36,7 @@ main:
     // GPIOD output data register, storing bits to it turns LED on
     LDR     r2, =GPIOD_ODR
     MOV     r1, LED_GREEN // Initial LED
-    MOV     r3, r1
+    MOV     r3, r1 // Backup the initial state to restore it later
 blink:
     STRH    r1, [r2]  // Turn LED on and other LEDs off
     BL      delay     // Wait a moment
@@ -44,9 +48,8 @@ blink:
 
 init:
     // Enable IO port D clock
-    LDR     r0, =RCC_AHB1ENR    
-    LDR     r1, [r0]            
-    ORR     r1, GPIODEN
+    LDR     r0, =RCC_AHB1ENR_GPIODEN
+    MOV     r1, 1
     STR     r1, [r0]
 
     // Configure GPIOD pins 12-15 as outputs where LEDs are connected to

@@ -24,7 +24,7 @@
 .EQU GPIOD_MODER,     GPIOD_BASE + 0x00 // GPIOD port mode register
 .EQU GPIOD_ODR,       GPIOD_BASE + 0x14 // GPIOD output data register
 
-.EQU MODER15_OUT,     1 << 30 // Configure output (1) for pin PD15 connected to blue LED
+.EQU MODER15_OUT,     1 << (LED_BLUE * 2) // Configure output (1) for pin PD15 connected to blue LED
 .EQU LED_BLUE,        15 // Blue LED data output bit
 
 .global main

@@ -117,6 +117,9 @@ int main(void) {
         /* USER CODE END WHILE */
         /* USER CODE BEGIN 3 */
 
+        // Wait a moment
+        HAL_Delay(50);
+
         // Print push button state
         if (BSP_PB_GetState(BUTTON_KEY) == GPIO_PIN_SET && lastPushButtonState == GPIO_PIN_RESET) {
             lastPushButtonState = GPIO_PIN_SET;
@@ -154,9 +157,6 @@ int main(void) {
 
         // Clear buffer otherwise the same key will be sent next time
         UserRxBufferFS[0] = '\0';
-
-        // Wait a moment
-        HAL_Delay(50);
     }
 }
 /* USER CODE END 3 */

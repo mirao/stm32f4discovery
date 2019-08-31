@@ -1,4 +1,4 @@
-## Demo of transfer between MCU and PC connected over Micro USB connector (Virtual COM Port)
+## Demo of transfer between MCU and PC connected over Micro USB connector (USB CDC, Virtual COM Port)
 Inspired by https://www.youtube.com/watch?v=AYICE0gU-Sg
 
 1. Connect your MCU to PC using Mini USB cable (needed for programming of MCU)

@@ -1,0 +1,11 @@
+{
+    "name": "STM32_USB_Device_Library",
+    "version": "0.0.0",
+    "build": {
+        "flags": [
+            "-I $PROJECT_DIR/Inc",
+            "-I Core/Inc",
+            "-I Class/CDC/Inc"
+        ]
+    }
+}

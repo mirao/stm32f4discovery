@@ -1,8 +1,8 @@
 ## Demo of transfer between MCU and PC connected over Micro USB connector (USB CDC, Virtual COM Port)
 Inspired by https://www.youtube.com/watch?v=AYICE0gU-Sg
 
-1. Connect your MCU to PC using Mini USB cable (needed for programming of MCU)
-2. Connect your MCU to PC using Micro USB cable
+1. Connect your MCU to PC over Mini USB connector (needed for programming of MCU)
+2. Connect your MCU to PC over Micro USB connector
 3. OS should detect new devices, one for STLink and one for STM32 Virtual ComPort:
 ```
 $ ls -ld /dev/ttyACM*

@@ -4,9 +4,9 @@
 2. Connect your "USB to TTL RS232 converter" ([PL2303](https://www.aliexpress.com/item/1981712661.html)) to PC, also over Mini USB connector
 3. Connect the converter, this time to MCU, using three wires:
     1. TX cable (green) to pin PB11 (USART3_RX)
-    2. RX cable (white) to pin PD8 (USART3 TX)
+    2. RX cable (white) to pin PD8 (USART3_TX)
     3. GND cable (black) to GND pin
-> If you've already uploaded the app, feel free to disconnect ST-LINK from PC and connect the converter's fourth red cable to 5V on MCU    
+> If you've already uploaded the app, feel free to disconnect ST-LINK from PC and connect the converter's fourth red cable to 5V on MCU. App should be still working.    
 3. OS should detect new devices, one for STLink and one for serial port:
 ```
 $ lsusb

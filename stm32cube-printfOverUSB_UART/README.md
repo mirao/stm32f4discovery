@@ -27,3 +27,5 @@ Bus 001 Device 008: ID 0483:374b STMicroelectronics ST-LINK/V2.1
 > If you get an error "Device or resource busy", uninstall ModemManager: `apt remove modemmanager`
 
 ### If things work well, you should see repeating text "Hello world!" in [output](printfOverUART.webm).
+
+![](MCU_PL2303.JPG "MCU <-> PL2303 connection")

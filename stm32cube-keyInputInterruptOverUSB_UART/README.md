@@ -21,7 +21,7 @@ Bus 001 Device 008: ID 0483:374b STMicroelectronics ST-LINK/V2.1
 ```
 > Executing task: platformio device monitor <
 
---- Miniterm on /dev/ttyUSB0  115200,8,N,1 ---
+--- Miniterm on /dev/ttyUSB0  921600,8,N,1 ---
 --- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
 ```
 > If it fails, check the config file `platform.ini` and change or remove the option `monitor_port = /dev/ttyUSB0`. PIO is able to detect and offer the right device.

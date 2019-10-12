@@ -3,14 +3,14 @@ Inspired by https://www.youtube.com/watch?v=AYICE0gU-Sg
 
 1. Connect your MCU to PC over Mini USB connector (needed for programming of MCU)
 2. Connect your MCU to PC over Micro USB connector
-3. OS should detect new devices, one for STLink and one for STM32 Virtual ComPort:
+3. Compile and upload app to MCU: **Platform IO: Upload**
+4. You should see two STM32 devices in OS, one for STLink and one for STM32 Virtual ComPort:
 ```
 $ ls -ld /dev/ttyACM*
 crw-rw-rw- 1 root plugdev 166, 0 Aug 31 13:57 /dev/ttyACM0
 crw-rw-rw- 1 root dialout 166, 1 Aug 31 15:47 /dev/ttyACM1
 ```
 > Tested on Ubuntu 19.04, other OS might have different devices
-4. Compile and upload app to MCU: **Platform IO: Upload**
 5. Open **Platform IO: Serial Monitor**, you should get this:
 ```
 > Executing task: platformio device monitor <

@@ -4,7 +4,8 @@
         "flags": [
             "-I $PROJECT_DIR/include",
             "-I Middlewares/STM32_USB_Device_Library/Core/Inc",
-            "-I Middlewares/STM32_USB_Device_Library/Class/HID/Inc"
+            "-I Middlewares/STM32_USB_Device_Library/Class/HID/Inc",
+            "-I Drivers/BSP/STM32F4-Discovery"
         ]
     }
 }
